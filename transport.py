@@ -8,4 +8,4 @@ class Transport:
         self.__maxSpeed = maxSpeed
 
     def move(self):
-        pass #залупа
+        pass
