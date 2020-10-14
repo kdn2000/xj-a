@@ -20,18 +20,17 @@ def AddLayers(map):
     folium.TileLayer('Stamen Toner').add_to(map)
     folium.TileLayer('Stamen Water Color').add_to(map)
     folium.TileLayer('cartodbpositron').add_to(map)
-    folium.TileLayer('cartodbdark_matter').add_to(map)
     folium.LayerControl().add_to(map)
 
 
 def CreateMap(G=None):
-    if not G is None:
+    if G is not None:
         nodes = G.nodes(data=True)
         edges = list(G.edges)
 
         m = ox.plot_graph_folium(G)
     else:
-        m = folium.Map(location=[48.92, 24.71], zoom_start=14)
+        m = folium.Map(location=[48.92, 24.71], zoom_start=14, tiles='cartodbdark_matter')
 
     # marker_cluster = MarkerCluster().add_to(m)
 
