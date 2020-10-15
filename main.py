@@ -1,4 +1,5 @@
 from transport import Car
+from lights import TrafficLights
 from folmap import CreateMap
 import osmnx as ox
 import folium
@@ -18,6 +19,11 @@ def main():
     print("Введіть координати машини")
     # lon, lat = map(float, input().split())
     Features = []
+
+    traffic_lights = TrafficLights(G)
+    traffic_lights.CreateIfTrafficLights()
+    traffic_lights.DrawTrafficLights(m)
+
     cars_c = 25
     for i in range(cars_c):
         lon, lat = uniform(48.888, 48.948), uniform(24.68, 24.752)
