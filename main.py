@@ -22,9 +22,9 @@ def main():
 
     traffic_lights = TrafficLights(G)
     traffic_lights.CreateIfTrafficLights()
-    traffic_lights.DrawTrafficLights(m)
 
     cars_c = 25
+    cars = []
     for i in range(cars_c):
         lon, lat = uniform(48.888, 48.948), uniform(24.68, 24.752)
         car = Car(lon, lat)
@@ -33,8 +33,14 @@ def main():
         # car.Draw(m)
         color = (randint(0, 256), randint(0, 256), randint(0, 256))
         car.DrawRoute(nodes.data(), m, color)
-        for F in car.Move(G, m):
-            Features.append(F)
+        cars.append(car)
+
+    """ Main cycle """
+    for i in range(1000):
+        for j in range(cars_c):
+            Features.append(cars[j].Move(G, m, i * 1.00001 * 1000))
+        traffic_lights.Calc()
+
 
     TimestampedGeoJson({
         'type': 'FeatureCollection',
