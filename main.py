@@ -56,6 +56,10 @@ def main():
     ).add_to(m)
     m.save("map.html")
 
+    #for saving in map-formats
+    ox.save_graph_geopackage(G, filepath='./export/map.gpkg')
+    fig, ax = ox.plot_graph(G, show=False, save=True, close=True, filepath='./export/map.svg')
+
 
 if __name__ == '__main__':
     main()
