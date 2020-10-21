@@ -1,4 +1,3 @@
-import folium
 from random import randint
 
 class TrafficLights:
@@ -6,8 +5,8 @@ class TrafficLights:
     def __init__(self, G):
         self.__G = G
         self.__Lights = []
-        self.__LightsTimers = []
-
+    
+    # Створюєм світлофори в архітектурі osmnx
     def CreateIfTrafficLights(self):
         for n, d in self.__G.nodes(data=True):
 
@@ -20,6 +19,7 @@ class TrafficLights:
             else:
                 d['is_light'] = False
     
+    # Розраховуєм чи зелене світло, чи червоне
     def Calc(self):
         Nodes = self.__G.nodes.data()
         for Light in self.__Lights:
@@ -29,12 +29,27 @@ class TrafficLights:
                 Node['is_open'] = not Node['is_open']
                 Light['timer'] = 0
 
-    def DrawTrafficLights(self, m):
-        for n, d in self.__G.nodes(data=True):
-
-            if d['is_light']:
-                folium.Marker(
-                    location=[d['y'], d['x']],
-                    tooltip='Світло_курва_фор',
-                ).add_to(m)
+    # Створюєм Features для кожного світлофора
+    def DrawTrafficLights(self, sec):
+        Nodes = self.__G.nodes.data()
+        Features = []
+        for Light in self.__Lights:
+            Feature = {
+                'type': 'Feature',
+                'properties': {
+                    'time': sec, #sec * i * 1000
+                    'icon': 'marker',
+                    'iconstyle': {
+                        'iconUrl': 'Assets/traffic_light_green.png' if Nodes[Light['osmid']]['is_open'] else 'Assets/traffic_light_red.png',
+                        'iconSize': [40, 40]
+                    }
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [Nodes[Light['osmid']]['x'], Nodes[Light['osmid']]['y']]
+                },
+            }
+            print(Feature)
+            Features.append(Feature)
+        return Features
 

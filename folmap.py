@@ -3,7 +3,7 @@ import folium
 import numpy as np
 from folium.plugins import MousePosition, MarkerCluster, Fullscreen, TimestampedGeoJson
 
-
+""" Тут все норм, потреби лізти сюда немає"""
 def AddTools(map):
     Fullscreen(
         position='topright',

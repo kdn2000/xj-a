@@ -1,18 +1,23 @@
-import math
-import numpy as np
+#import math
+#import numpy as np
 import osmnx as ox
 import networkx as nx
 import folium
 from folium.features import CustomIcon
-from folium.plugins import TimestampedGeoJson
-from math import atan, cos, sin, fabs, sqrt
-from random import choice
+#from folium.plugins import TimestampedGeoJson
+from math import sqrt #atan, cos, sin, fabs,
+from geojson import Point, Feature
+#from random import choice
 
-
+""" З назви пон, що це робить"""
 def rgb_to_hex(rgb):
     return '%02x%02x%02x' % rgb
 
-
+""" Клас машини.  SetRoute - встановлює шлях. 
+    SelNearestNode - використовується при запуску, запусує координати найближчої ноди.
+    Move - розрахунок наступного кроку, Бібічка рухається по шляху.
+    Draw - не використовується
+    DrawRoute - малює шлях"""
 class Car:
     def __init__(self, Longitude, Latitude, MaxSpeed=100, Speed=0, Type_="car"):
         self.Lon = Longitude
