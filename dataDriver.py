@@ -22,10 +22,11 @@ class DataDriver:
     
     
     def GetPOIs(self, place, tags):
-        dir_ = self.__dir + '/pois.csv'
+        dir_ = self.__dir + '/pois.geojson'
         if os.path.exists(dir_) is False:
             self.__POIsData = pois.pois_from_place(place, tags)
-            self.__POIsData.to_csv(dir_)
+            with open(dir_, 'w') as f:
+                f.write(self.__POIsData.to_json())
         else:
             self.__POIsData = gpd.read_file(dir_)
         #print(self.__POIsData.head(8))

@@ -5,8 +5,8 @@ import networkx as nx
 import folium
 from folium.features import CustomIcon
 #from folium.plugins import TimestampedGeoJson
-from math import sqrt #atan, cos, sin, fabs,
-from geojson import Point, Feature
+from math import sqrt, cos, pi #atan, cos, sin, fabs,
+#from geojson import Point, Feature
 #from random import choice
 
 """ З назви пон, що це робить"""
@@ -23,12 +23,14 @@ class Car:
         self.Lon = Longitude
         self.Lat = Latitude
         self.__Type_ = Type_
-        self.__Speed = 0.0001
+        self.__Speed = 40 # km for hour
         self.__MaxSpeed = MaxSpeed
         self.__Route = []
         self.__From = None
         self.__To = None
         self.__Icon = CustomIcon('Assets/car.png', icon_size=(50, 50))
+        self.__ConstLat = 111.32
+        self.__ConstLon = 111.32 * cos(round(Latitude)*pi/360) # Найбільша похибка 1 км (sin(x - PI/360) - sin(x))    
 
     def SetRoute(self, Node, G):
         route = nx.dijkstra_path(G, self.__From, Node, weight='length')
@@ -46,6 +48,8 @@ class Car:
     def Move(self, G, m, sec): # sec=1.00001
         #g = 0
         Nodes = G.nodes.data()
+        SpeedLon = self.__Speed / (3600 * self.__ConstLon)
+        SpeedLat = self.__Speed / (3600 * self.__ConstLat)
         Feature = {
             'type': 'Feature',
             'properties': {
@@ -67,16 +71,16 @@ class Car:
         Side2 = Nodes[self.__To]['y'] - Nodes[self.__From]['y']
         MainSide = sqrt(Side2 ** 2 + Side1 ** 2)
         try:
-            self.Lat += self.__Speed * (Side1 / MainSide)
+            self.Lat += SpeedLat * (Side1 / MainSide)
         except:
             pass
         try:
-            self.Lon += self.__Speed * (Side2 / MainSide)
+            self.Lon += SpeedLon * (Side2 / MainSide)
         except:
             pass
 
-        XRange = Nodes[self.__To]['x'] - self.__Speed < self.Lat < Nodes[self.__To]['x'] + self.__Speed
-        YRange = Nodes[self.__To]['y'] - self.__Speed < self.Lon < Nodes[self.__To]['y'] + self.__Speed
+        XRange = Nodes[self.__To]['x'] - SpeedLat < self.Lat < Nodes[self.__To]['x'] + SpeedLat
+        YRange = Nodes[self.__To]['y'] - SpeedLon < self.Lon < Nodes[self.__To]['y'] + SpeedLon
         try:
             if XRange and YRange:
                 #g += 1
