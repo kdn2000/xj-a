@@ -1,5 +1,5 @@
 from transport import Car
-from lights import TrafficLights
+from infrastructure import Infrastructure
 from dataDriver import DataDriver
 from folmap import CreateMap
 import osmnx as ox
@@ -26,15 +26,16 @@ def main():
     
     Features = []
     
-    traffic_lights = TrafficLights(G)
-    traffic_lights.CreateIfTrafficLights()
+    infrastructure = Infrastructure(G)
+    infrastructure.ExpansionRoads()
+    infrastructure.CreateIfTrafficLights()
 
     cars_c = 25
     cars = []
     # Створюєм машинки
     for i in range(cars_c):
         lon, lat = uniform(48.888, 48.948), uniform(24.68, 24.752)
-        car = Car(lon, lat)
+        car = Car(i, lon, lat)
         car.SelNearestNode(G)
         car.SetRoute(list(nodes)[randint(0, 100)], G)
         # car.Draw(m)
@@ -46,8 +47,8 @@ def main():
     #  Сихронізація. i - це еквівалент часу ( його перетворення бачимо в time).
     for i in range(1000):
         time = i * 1.00001 * 1000
-        traffic_lights.Calc()
-        Features.extend(traffic_lights.DrawTrafficLights(time))
+        infrastructure.Calc()
+        Features.extend(infrastructure.DrawTrafficLights(time))
         for j in range(cars_c):
             Features.append(cars[j].Move(G, m, time)) 
         data_driver.UpdateFeatures(Features) # передаєм у клас DataDriver наші Features
