@@ -15,74 +15,103 @@ def rgb_to_hex(rgb):
     Draw - не використовується
     DrawRoute - малює шлях"""
 class Car:
-    def __init__(self, Id, Longitude, Latitude, MaxSpeed=100, Speed=0, Type_="car"):
+    def __init__(self, Id, Longitude, Latitude, MaxSpeed=60, Speed=0, Type_="car"):
         self.Lon = Longitude
         self.Lat = Latitude
+        self.Speed = Speed # km for hour
+        self.Dist = 0
         self.__Id = Id
         self.__Type_ = Type_
-        self.__Speed = 40 # km for hour
+        self.__Acceleration = 15 # km for hour^2
         self.__MaxSpeed = MaxSpeed
-        self.__Route = []
+        self.__RouteNodes = []
+        self.__RouteLanes = []
         self.__From = None
         self.__To = None
         self.__Road = None
-        self.__CurrentLine = None
+        self.__CurrentLane = None
         self.__Icon = CustomIcon('Assets/car.png', icon_size=(50, 50))
         self.__ConstLat = 111.32
-        self.__ConstLon = 111.32 * cos(round(Latitude)*pi/360) # Найбільша похибка 1 км (sin(x - PI/360) - sin(x))    
+        self.__ConstLon = 111.32 #* cos(round(Latitude)*pi/360) # Найбільша похибка 1 км (sin(x - PI/360) - sin(x))    
         
     def GetId(self):
         return self.__Id
     
-    """Вибирає полосу на якій їздити. Це для того, аби вірішити питання з перестройкою на полосу. Beta"""
-    def ChangeRoad(self, G):
-        self.__Road = G.get_edge_data(self.__From, self.__To)[0]
-        if self.__Road['lanes'] == 1 or self.__Road['oneway'] == True:
-            self.__Road['queue'][self.__To][0]['cars'].append(self.__Id)
+    """Вибирає полосу на якій їздити. Це ініціалізація. Це для того, аби вірішити питання з перестройкою на полосу. Beta"""
+    def SetRoad(self, G, From, To, Next):            
+        Road = G.get_edge_data(From, To)[0]
+        
+        if Road['lanes'] == 1 or Road['oneway'] == True:
+            Lines = 0
             pass
         
-        Index = self.__Route.index(self.__To) + 1
-        # try:
-        Side1 = G.nodes[self.__To]['x'] - G.nodes[self.__From]['x']
-        Side2 = G.nodes[self.__To]['y'] - G.nodes[self.__From]['y']
+        Side1 = G.nodes[To]['x'] - G.nodes[From]['x']
+        Side2 = G.nodes[To]['y'] - G.nodes[From]['y']
         AngleCurrent = atan(Side2/Side1)
-        Side1 = G.nodes[self.__Route[Index]]['x'] - G.nodes[self.__To]['x']
-        Side2 = G.nodes[self.__Route[Index]]['y'] - G.nodes[self.__To]['y']
+        Side1 = G.nodes[Next]['x'] - G.nodes[To]['x']
+        Side2 = G.nodes[Next]['y'] - G.nodes[To]['y']
         AngleFuture = atan(Side2/Side1)
         Angle = AngleFuture - AngleCurrent
-        # except:
-        #     pass
         
-        # try:
-        if Angle <= pi/3:
-            self.__CurrentLine = len(self.__Road['queue'][self.__To]) - 1
-        elif Angle >= 3*pi/2:
-            self.__CurrentLine = 0
+        if Angle <= pi/3 and G.nodes[Next]['is_light'] is True:
+            Lines = len(Road['queue'][To]) - 1
+        elif Angle >= 4*pi/3 and G.nodes[Next]['is_light'] is True:
+            Lines = 0
         else:
-            Lenght = len(self.__Road['queue'][self.__To])
-            Index = None
-            Min = 1000
+            Lenght = len(Road['queue'][To])
             if Lenght == 2:
-                for i in [0, 1]:
-                    if len(self.__Road['queue'][self.__To][i]['cars'])  < Min:
-                        Min = len(self.__Road['queue'][self.__To][i]['cars'])
-                        Index = i
+                Lines = [0, 1]
             else:
-                for i in range(1, Lenght - 1):
-                    if len(self.__Road['queue'][self.__To][i]['cars'])  < Min:
-                        Min = len(self.__Road['queue'][self.__To][i]['cars'])
-                        Index = i
-            self.__CurrentLine = Index
-        try:
-            self.__Road['queue'][self.__To][self.__CurrentLine]['cars'].append(self.__Id)
-        except:
-            pass
+                Lines = [ i for i in range(1, Lenght - 1)]
+        
+        return Lines
 
+    def SetSpeed(self, G, Cars, Time):
+        Nodes = G.nodes.data()
+        
+        if 'maxspeed' in self.__Road:
+            MaxSpeed = self.__Road['maxspeed']
+        else:
+            MaxSpeed = self.__MaxSpeed
+        
+        FutureLenght = (self.__Speed / (3600 * self.__ConstLon)) * Time
+        FutureRoads = []
+        Side1 = self.__Lat - Nodes[self.__To]['x']
+        Side2 = self.__Lon - Nodes[self.__To]['y']
+        Lenght = sqrt(Side1 ** 2 + Side2 ** 2)
+        FutureLenght -= Lenght
+        FutureRoads.append({self.__Road})
+        Index = self.__RouteNodes.index(self.__To) + 1
+        while FutureLenght > 0:
+            Side1 = Nodes[self.__RouteNodes[Index - 1]]['x'] - Nodes[self.__RouteNodes[Index]]['x']
+            Side2 = Nodes[self.__RouteNodes[Index - 1]]['y'] - Nodes[self.__RouteNodes[Index]]['y']
+            Lenght = sqrt(Side1 ** 2 + Side2 ** 2)
+            FutureLenght -= Lenght
+            FutureRoads.append({'road': G.get_edge_data(Nodes[self.__RouteNodes[Index - 1]], Nodes[self.__RouteNodes[Index]])[0], 'lenght': Lenght})
+            Index += 1
+        
+        Objects = []
+        Index = self.__RouteNodes.index(self.__To)
+        #Objects.extend(self.__Road['queue'][self.__To][self.__CurrentLane])
+        for Road in FutureRoads:
+            for Lane in self.__RouteLanes[Index - 1]:
+                Vehicles = Road['queue'][self.__RouteNodes[Index]][Lane]
+                for Vehicle in Vehicles:
+                    Objects.append(Cars[Vehicle])
+            
+        
+        
+    
     def SetRoute(self, Node, G):
         route = nx.dijkstra_path(G, self.__From, Node, weight='length')
         self.__To = route[1]
-        self.__Route = route
-        self.ChangeRoad(G)
+        self.__RouteNodes = route
+        """RouteLines - це на які полоси можна заходити під час руху."""
+        for i in range(len(route) - 1):
+            if i == len(route) - 1:
+                self.__RouteLanes.append(0)
+            else:
+                self.__RouteLanes.append(self.SetRoad(G, self.__RouteNodes[route[i]], self.__RouteNodes[route[i + 1]], self.__RouteNodes[route[i + 2]]))
 
     def SelNearestNode(self, G):
         Nodes = G.nodes.data()
@@ -91,6 +120,8 @@ class Car:
         self.__From = Node
         self.Lon = Nodes[Node]['y']
         self.Lat = Nodes[Node]['x']
+        self.__Road = G.get_edge_data(self.__From, self.__To)[0]
+        self.__CurrentLane = 0
 
     def Move(self, G, m, sec): # sec=1.00001
         #g = 0
@@ -112,11 +143,12 @@ class Car:
                 'coordinates': [self.Lat, self.Lon]
             },
         }
-
+        
 
         Side1 = Nodes[self.__To]['x'] - Nodes[self.__From]['x']
         Side2 = Nodes[self.__To]['y'] - Nodes[self.__From]['y']
         MainSide = sqrt(Side2 ** 2 + Side1 ** 2)
+        self.Dist += self.__Speed / (3600 * self.__ConstLon)
         try:
             self.Lat += SpeedLat * (Side1 / MainSide)
         except:
@@ -126,20 +158,21 @@ class Car:
         except:
             pass
         
-        
+        self.SetSpeed(G, 3)
         
         XRange = Nodes[self.__To]['x'] - SpeedLat < self.Lat < Nodes[self.__To]['x'] + SpeedLat
         YRange = Nodes[self.__To]['y'] - SpeedLon < self.Lon < Nodes[self.__To]['y'] + SpeedLon
         try:
             if XRange and YRange:
                 #g += 1
+                self.Dist = 0
                 self.__Road['queue'][self.__To][self.__CurrentLine]['cars'].remove(self.__Id) # видаляє машинку з полоси
                 self.__From = self.__To
                 self.Lat = Nodes[self.__From]['x']
                 self.Lon = Nodes[self.__From]['y']
-                Index = self.__Route.index(self.__To)
-                self.__To = self.__Route[Index + 1]
-                self.ChangeRoad(G) # вибрати полосу
+                Index = self.__RouteNodes.index(self.__To)
+                self.__To = self.__RouteNodes[Index + 1]
+                self.__Road = G.get_edge_data(self.__From, self.__To)[0]
                     # if Index + 2 == len(self.__Route):
                     #     self.Draw(m)
                     #     print(Index, g, i)

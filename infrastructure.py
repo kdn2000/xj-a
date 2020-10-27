@@ -28,6 +28,7 @@ class Infrastructure:
             if len(list(self.__G.edges(n))) > 3:
                 d['is_light'] = True
                 d['delay'] = [randint(20, 100), randint(20, 100)]
+                d['timer'] = 0
                 d['for_open'] = {'first_group': [], 'second_group': []}
                 d['is_open'] = [True, False]
                 try:
@@ -48,7 +49,7 @@ class Infrastructure:
                 except:
                     pass
                 
-                self.__Lights.append({'osmid' : n, 'timer' : 0})
+                self.__Lights.append({'osmid' : n})
             else:
                 d['is_light'] = False
     
@@ -56,8 +57,8 @@ class Infrastructure:
     def Calc(self):
         Nodes = self.__G.nodes.data()
         for Light in self.__Lights:
-            Light['timer'] += 1
             Node = Nodes[Light['osmid']]
+            Node['timer'] += 1
             if Node['is_open'][0] is True:
                 if Light['timer'] >= Node['delay'][1]:
                     Node['is_open'] = [False, True]
