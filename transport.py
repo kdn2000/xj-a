@@ -42,7 +42,7 @@ class Car:
         Road = G.get_edge_data(From, To)[0]
         
         if Road['lanes'] == 1 or Road['oneway'] == True:
-            Lines = 0
+            Lines = [0]
             pass
         
         Side1 = G.nodes[To]['x'] - G.nodes[From]['x']
@@ -54,52 +54,72 @@ class Car:
         Angle = AngleFuture - AngleCurrent
         
         if Angle <= pi/3 and G.nodes[Next]['is_light'] is True:
-            Lines = len(Road['queue'][To]) - 1
+            Lines = [len(Road['queue'][To]) - 1]
         elif Angle >= 4*pi/3 and G.nodes[Next]['is_light'] is True:
-            Lines = 0
+            Lines = [0]
         else:
             Lenght = len(Road['queue'][To])
             if Lenght == 2:
                 Lines = [0, 1]
             else:
-                Lines = [ i for i in range(1, Lenght - 1)]
+                Lines = [i for i in range(1, Lenght - 1)]
         
         return Lines
 
     def SetSpeed(self, G, Cars, Time):
         Nodes = G.nodes.data()
+        Slacken = False
         
         if 'maxspeed' in self.__Road:
-            MaxSpeed = self.__Road['maxspeed']
+            MaxSpeed = int(self.__Road['maxspeed'])
         else:
             MaxSpeed = self.__MaxSpeed
         
-        FutureLenght = (self.__Speed / (3600 * self.__ConstLon)) * Time
+        FutureLenght = (self.Speed / (3600 * self.__ConstLon)) * Time
         FutureRoads = []
-        Side1 = self.__Lat - Nodes[self.__To]['x']
-        Side2 = self.__Lon - Nodes[self.__To]['y']
+        Lights = []
+        Side1 = self.Lat - Nodes[self.__To]['x']
+        Side2 = self.Lon - Nodes[self.__To]['y']
         Lenght = sqrt(Side1 ** 2 + Side2 ** 2)
         FutureLenght -= Lenght
-        FutureRoads.append({self.__Road})
+        FutureRoads.append({'road': self.__Road, 'lenght': Lenght})
         Index = self.__RouteNodes.index(self.__To) + 1
-        while FutureLenght > 0:
-            Side1 = Nodes[self.__RouteNodes[Index - 1]]['x'] - Nodes[self.__RouteNodes[Index]]['x']
-            Side2 = Nodes[self.__RouteNodes[Index - 1]]['y'] - Nodes[self.__RouteNodes[Index]]['y']
-            Lenght = sqrt(Side1 ** 2 + Side2 ** 2)
-            FutureLenght -= Lenght
-            FutureRoads.append({'road': G.get_edge_data(Nodes[self.__RouteNodes[Index - 1]], Nodes[self.__RouteNodes[Index]])[0], 'lenght': Lenght})
-            Index += 1
+        try:
+            while FutureLenght > 0:
+                if Nodes[self.__RouteNodes[Index - 1]]['is_light'] is True:
+                    Lights.append({'light': Nodes[self.__RouteNodes[Index - 1]], 'index_road': len(FutureRoads) - 1})
+                Side1 = Nodes[self.__RouteNodes[Index - 1]]['x'] - Nodes[self.__RouteNodes[Index]]['x']
+                Side2 = Nodes[self.__RouteNodes[Index - 1]]['y'] - Nodes[self.__RouteNodes[Index]]['y']
+                Lenght += sqrt(Side1 ** 2 + Side2 ** 2)
+                FutureLenght -= Lenght
+                FutureRoads.append({'road': G.get_edge_data(self.__RouteNodes[Index - 1], self.__RouteNodes[Index]), 'lenght': Lenght})
+                Index += 1
+        except:
+            pass
         
-        Objects = []
-        Index = self.__RouteNodes.index(self.__To)
-        #Objects.extend(self.__Road['queue'][self.__To][self.__CurrentLane])
-        for Road in FutureRoads:
-            for Lane in self.__RouteLanes[Index - 1]:
-                Vehicles = Road['queue'][self.__RouteNodes[Index]][Lane]
-                for Vehicle in Vehicles:
-                    Objects.append(Cars[Vehicle])
+        # Objects = []
+        # Index = self.__RouteNodes.index(self.__To)
+        # #Objects.extend(self.__Road['queue'][self.__To][self.__CurrentLane])
+        # for Road in FutureRoads:
+        #     for Lane in self.__RouteLanes[Index - 1]:
+        #         Vehicles = Road['road']['queue'][self.__RouteNodes[Index]][Lane]
+        #         for Vehicle in Vehicles:
+        #             Objects.append(Cars[Vehicle])
+        
+        for Light in Lights:
+            S = FutureRoads[Light['index_road']]['lenght']
+            if self.Speed > S / Time:
+                Slacken = True
+        
+        if Slacken is True:
+            self.Speed -= self.__Acceleration
+            if self.Speed < 0:
+                self.Speed = 0
+        if Slacken is False and self.Speed < MaxSpeed:
+            self.Speed += self.__Acceleration
+            if self.Speed > MaxSpeed:
+                self.Speed = MaxSpeed
             
-        
         
     
     def SetRoute(self, Node, G):
@@ -107,11 +127,14 @@ class Car:
         self.__To = route[1]
         self.__RouteNodes = route
         """RouteLines - це на які полоси можна заходити під час руху."""
-        for i in range(len(route) - 1):
-            if i == len(route) - 1:
-                self.__RouteLanes.append(0)
-            else:
+        try:
+            for i in range(len(route)):
                 self.__RouteLanes.append(self.SetRoad(G, self.__RouteNodes[route[i]], self.__RouteNodes[route[i + 1]], self.__RouteNodes[route[i + 2]]))
+        except:
+            self.__RouteLanes.append(0)
+        
+        self.__Road = G.get_edge_data(self.__From, self.__To)[0]
+        self.__CurrentLane = 0
 
     def SelNearestNode(self, G):
         Nodes = G.nodes.data()
@@ -120,14 +143,12 @@ class Car:
         self.__From = Node
         self.Lon = Nodes[Node]['y']
         self.Lat = Nodes[Node]['x']
-        self.__Road = G.get_edge_data(self.__From, self.__To)[0]
-        self.__CurrentLane = 0
 
-    def Move(self, G, m, sec): # sec=1.00001
+    def Move(self, G, Cars, sec): # sec=1.00001
         #g = 0
         Nodes = G.nodes.data()
-        SpeedLon = self.__Speed / (3600 * self.__ConstLon)
-        SpeedLat = self.__Speed / (3600 * self.__ConstLat)
+        SpeedLon = self.Speed / (3600 * self.__ConstLon)
+        SpeedLat = self.Speed / (3600 * self.__ConstLat)
         Feature = {
             'type': 'Feature',
             'properties': {
@@ -148,7 +169,7 @@ class Car:
         Side1 = Nodes[self.__To]['x'] - Nodes[self.__From]['x']
         Side2 = Nodes[self.__To]['y'] - Nodes[self.__From]['y']
         MainSide = sqrt(Side2 ** 2 + Side1 ** 2)
-        self.Dist += self.__Speed / (3600 * self.__ConstLon)
+        self.Dist += self.Speed / (3600 * self.__ConstLon)
         try:
             self.Lat += SpeedLat * (Side1 / MainSide)
         except:
@@ -158,7 +179,7 @@ class Car:
         except:
             pass
         
-        self.SetSpeed(G, 3)
+        self.SetSpeed(G, Cars, 5)
         
         XRange = Nodes[self.__To]['x'] - SpeedLat < self.Lat < Nodes[self.__To]['x'] + SpeedLat
         YRange = Nodes[self.__To]['y'] - SpeedLon < self.Lon < Nodes[self.__To]['y'] + SpeedLon
@@ -166,7 +187,7 @@ class Car:
             if XRange and YRange:
                 #g += 1
                 self.Dist = 0
-                self.__Road['queue'][self.__To][self.__CurrentLine]['cars'].remove(self.__Id) # видаляє машинку з полоси
+                #self.__Road['queue'][self.__To][self.__CurrentLine]['cars'].remove(self.__Id) # видаляє машинку з полоси
                 self.__From = self.__To
                 self.Lat = Nodes[self.__From]['x']
                 self.Lon = Nodes[self.__From]['y']
@@ -192,11 +213,11 @@ class Car:
 
     def DrawRoute(self, Nodes, m, col):
         locations = []
-        for i in range(len(self.__Route) - 1):
-            x1 = Nodes[self.__Route[i]]['x']
-            y1 = Nodes[self.__Route[i]]['y']
-            x2 = Nodes[self.__Route[i + 1]]['x']
-            y2 = Nodes[self.__Route[i + 1]]['y']
+        for i in range(len(self.__RouteNodes) - 1):
+            x1 = Nodes[self.__RouteNodes[i]]['x']
+            y1 = Nodes[self.__RouteNodes[i]]['y']
+            x2 = Nodes[self.__RouteNodes[i + 1]]['x']
+            y2 = Nodes[self.__RouteNodes[i + 1]]['y']
             locations.append([(y1, x1), (y2, x2)])
 
         print(locations)

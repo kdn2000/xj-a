@@ -60,10 +60,10 @@ class Infrastructure:
             Node = Nodes[Light['osmid']]
             Node['timer'] += 1
             if Node['is_open'][0] is True:
-                if Light['timer'] >= Node['delay'][1]:
+                if Node['timer'] >= Node['delay'][1]:
                     Node['is_open'] = [False, True]
             if Node['is_open'][1] is True:
-                if Light['timer'] >= Node['delay'][0]:
+                if Node['timer'] >= Node['delay'][0]:
                     Node['is_open'] = [True, False]
             # if Light['timer'] >= Node['delay']:
             #     Node['is_open'] = not Node['is_open']

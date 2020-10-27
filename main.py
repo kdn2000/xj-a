@@ -50,7 +50,7 @@ def main():
         infrastructure.Calc()
         Features.extend(infrastructure.DrawTrafficLights(time))
         for j in range(cars_c):
-            Features.append(cars[j].Move(G, m, time)) 
+            Features.append(cars[j].Move(G, cars, time)) 
         data_driver.UpdateFeatures(Features) # передаєм у клас DataDriver наші Features
         Features.clear()
 
