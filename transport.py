@@ -22,7 +22,7 @@ class Car:
         self.Dist = 0
         self.__Id = Id
         self.__Type_ = Type_
-        self.__Acceleration = 15 # km for hour^2
+        self.__Acceleration = 3 # m for s^2
         self.__MaxSpeed = MaxSpeed
         self.__RouteNodes = []
         self.__RouteLanes = []
@@ -33,6 +33,8 @@ class Car:
         self.__Icon = CustomIcon('Assets/car.png', icon_size=(50, 50))
         self.__ConstLat = 111.32
         self.__ConstLon = 111.32 #* cos(round(Latitude)*pi/360) # Найбільша похибка 1 км (sin(x - PI/360) - sin(x))    
+        self.__SlowDown = False
+        
         
     def GetId(self):
         return self.__Id
@@ -68,35 +70,45 @@ class Car:
 
     def SetSpeed(self, G, Cars, Time):
         Nodes = G.nodes.data()
-        Slacken = False
+        Detected = False
         
         if 'maxspeed' in self.__Road:
             MaxSpeed = int(self.__Road['maxspeed'])
         else:
             MaxSpeed = self.__MaxSpeed
         
-        FutureLenght = (self.Speed / (3600 * self.__ConstLon)) * Time
+        """Знайти дороги по яким можуть пересуватися потенційні об'єкти для зіткнення."""
+        FutureLenght = ((self.Speed + 10) / (3600 * self.__ConstLon)) * Time
         FutureRoads = []
         Lights = []
         Side1 = self.Lat - Nodes[self.__To]['x']
         Side2 = self.Lon - Nodes[self.__To]['y']
         Lenght = sqrt(Side1 ** 2 + Side2 ** 2)
-        FutureLenght -= Lenght
         FutureRoads.append({'road': self.__Road, 'lenght': Lenght})
         Index = self.__RouteNodes.index(self.__To) + 1
         try:
-            while FutureLenght > 0:
-                if Nodes[self.__RouteNodes[Index - 1]]['is_light'] is True:
-                    Lights.append({'light': Nodes[self.__RouteNodes[Index - 1]], 'index_road': len(FutureRoads) - 1})
+            while FutureLenght - Lenght > 0:
+                if 'is_light' in Nodes[self.__RouteNodes[Index - 1]]:
+                    if Nodes[self.__RouteNodes[Index - 1]]['is_light'] is True:
+                        Node = Nodes[self.__RouteNodes[Index - 1]]
+                        Node1 = Nodes[self.__RouteNodes[Index]]
+                        Group = 2 if Node['is_open'][0] else 1 
+                        if Group == 1:
+                            if [int(Node['osmid']), int(Node1['osmid'])] in Node['for_open']['first_group']:
+                                Lights.append({'light': Node, 'index_road': len(FutureRoads) - 1})
+                        else:
+                            if [int(Node['osmid']), int(Node1['osmid'])] in Node['for_open']['second_group']:
+                                Lights.append({'light': Node, 'index_road': len(FutureRoads) - 1})
+                        
                 Side1 = Nodes[self.__RouteNodes[Index - 1]]['x'] - Nodes[self.__RouteNodes[Index]]['x']
                 Side2 = Nodes[self.__RouteNodes[Index - 1]]['y'] - Nodes[self.__RouteNodes[Index]]['y']
                 Lenght += sqrt(Side1 ** 2 + Side2 ** 2)
-                FutureLenght -= Lenght
                 FutureRoads.append({'road': G.get_edge_data(self.__RouteNodes[Index - 1], self.__RouteNodes[Index]), 'lenght': Lenght})
                 Index += 1
-        except:
-            pass
+        except Exception as e:
+            print(e)
         
+        # Чи є зіткнення з машинками.
         # Objects = []
         # Index = self.__RouteNodes.index(self.__To)
         # #Objects.extend(self.__Road['queue'][self.__To][self.__CurrentLane])
@@ -106,22 +118,31 @@ class Car:
         #         for Vehicle in Vehicles:
         #             Objects.append(Cars[Vehicle])
         
+        """ Чи є зіткнення з світлофорами."""
         for Light in Lights:
             S = FutureRoads[Light['index_road']]['lenght']
-            if self.Speed > S / Time:
-                Slacken = True
+            L = self.Speed ** 2 / (2 * self.__Acceleration * (3.6 ** 3) * 1000 * self.__ConstLon)
+            if S - (5 / (1000 * self.__ConstLon)) > L:
+                Detected = True
+            else:
+                if self.__SlowDown is True and self.Speed == 0:
+                    Detected = True
+                
         
-        if Slacken is True:
-            self.Speed -= self.__Acceleration
-            if self.Speed < 0:
-                self.Speed = 0
-        if Slacken is False and self.Speed < MaxSpeed:
-            self.Speed += self.__Acceleration
+        if Detected is True:
+            self.__SlowDown = True
+        else:
+            self.__SlowDown = False
+        
+        if self.__SlowDown is True:
+            self.Speed -= int(self.__Acceleration * 3.6)
+            if self.Speed <= 10:
+                self.Speed = 0 
+        else:
+            self.Speed += int(self.__Acceleration * 3.6)
             if self.Speed > MaxSpeed:
                 self.Speed = MaxSpeed
-            
-        
-    
+      
     def SetRoute(self, Node, G):
         route = nx.dijkstra_path(G, self.__From, Node, weight='length')
         self.__To = route[1]
@@ -154,6 +175,7 @@ class Car:
             'properties': {
                 'time': sec, #sec * i * 1000
                 'icon': 'marker',
+                'popup': '<h1>{}</h1>'.format(self.Speed),
                 'iconstyle': {
                     'iconUrl': 'Assets/car.png',
                     'iconSize': [40, 40]
