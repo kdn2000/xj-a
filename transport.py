@@ -78,7 +78,7 @@ class Car:
             MaxSpeed = self.__MaxSpeed
         
         """Знайти дороги по яким можуть пересуватися потенційні об'єкти для зіткнення."""
-        FutureLenght = ((self.Speed + 10) / (3600 * self.__ConstLon)) * Time
+        FutureLenght = ((self.Speed + 20) / (3600 * self.__ConstLon)) * Time
         FutureRoads = []
         Lights = []
         Side1 = self.Lat - Nodes[self.__To]['x']
@@ -108,20 +108,32 @@ class Car:
         except Exception as e:
             print(e)
         
-        # Чи є зіткнення з машинками.
-        # Objects = []
-        # Index = self.__RouteNodes.index(self.__To)
-        # #Objects.extend(self.__Road['queue'][self.__To][self.__CurrentLane])
-        # for Road in FutureRoads:
-        #     for Lane in self.__RouteLanes[Index - 1]:
-        #         Vehicles = Road['road']['queue'][self.__RouteNodes[Index]][Lane]
-        #         for Vehicle in Vehicles:
-        #             Objects.append(Cars[Vehicle])
-        
+        L = self.Speed ** 2 / (2 * self.__Acceleration * (3.6 ** 3) * 1000 * self.__ConstLon)
+        Index = self.__RouteNodes.index(self.__To)
+        """Чи є зіткнення з машинками. Машинки стоять на полосі. Машинки знають на яку їм потрібно їхати полосу"""
+        try:
+            for Road in FutureRoads:
+                for Lane in self.__RouteLanes[Index - 1]:
+                    if 'queue' in Road['road']:
+                        Vehicles = Road['road']['queue'][self.__RouteNodes[Index]][Lane]['cars']
+                        for Vehicle in Vehicles:
+                            RoadIndex = FutureRoads.index(Road) - 1
+                            if RoadIndex < 0:
+                                S = Cars[Vehicle].Dist
+                            else:
+                                S = FutureRoads[RoadIndex]['lenght'] + Cars[Vehicle].Dist 
+                            if S - (5 / (1000 * self.__ConstLon)) > L:
+                                Detected = True
+                            else:
+                                if self.__SlowDown is True and self.Speed == 0:
+                                    Detected = True
+            
+        except:
+            pass
+                            
         """ Чи є зіткнення з світлофорами."""
         for Light in Lights:
             S = FutureRoads[Light['index_road']]['lenght']
-            L = self.Speed ** 2 / (2 * self.__Acceleration * (3.6 ** 3) * 1000 * self.__ConstLon)
             if S - (5 / (1000 * self.__ConstLon)) > L:
                 Detected = True
             else:
@@ -152,7 +164,7 @@ class Car:
             for i in range(len(route)):
                 self.__RouteLanes.append(self.SetRoad(G, self.__RouteNodes[route[i]], self.__RouteNodes[route[i + 1]], self.__RouteNodes[route[i + 2]]))
         except:
-            self.__RouteLanes.append(0)
+            self.__RouteLanes.append([0])
         
         self.__Road = G.get_edge_data(self.__From, self.__To)[0]
         self.__CurrentLane = 0
@@ -209,13 +221,22 @@ class Car:
             if XRange and YRange:
                 #g += 1
                 self.Dist = 0
-                #self.__Road['queue'][self.__To][self.__CurrentLine]['cars'].remove(self.__Id) # видаляє машинку з полоси
+                try:
+                    self.__Road['queue'][self.__To][self.__CurrentLane]['cars'].remove(self.__Id) # видаляє машинку з полоси
+                except:
+                    pass
                 self.__From = self.__To
                 self.Lat = Nodes[self.__From]['x']
                 self.Lon = Nodes[self.__From]['y']
                 Index = self.__RouteNodes.index(self.__To)
                 self.__To = self.__RouteNodes[Index + 1]
                 self.__Road = G.get_edge_data(self.__From, self.__To)[0]
+                Min = 100
+                for Lanes in self.__RouteLanes[Index]:
+                    for Lane in Lanes:
+                        if len(Lane) <= Min:
+                            self.__CurrentLane = Lane 
+                self.__Road['queue'][self.__To][self.__CurrentLane]['cars'].append(self.__Id)
                     # if Index + 2 == len(self.__Route):
                     #     self.Draw(m)
                     #     print(Index, g, i)
