@@ -369,52 +369,52 @@
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="MapboxAccountsUnity">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/MapboxAccounts/net35/MapboxAccountsUnity.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/MapboxAccounts/net35/MapboxAccountsUnity.dll</HintPath>
     </Reference>
     <Reference Include="Mapbox.VectorTile.ExtensionMethods">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.ExtensionMethods.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.ExtensionMethods.dll</HintPath>
     </Reference>
     <Reference Include="Mapbox.VectorTile.Geometry">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.Geometry.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.Geometry.dll</HintPath>
     </Reference>
     <Reference Include="Mapbox.VectorTile.PbfReader">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.PbfReader.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.PbfReader.dll</HintPath>
     </Reference>
     <Reference Include="Mapbox.VectorTile.VectorTileReader">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.VectorTileReader.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/Mapbox/vector-tile-cs/net46/Mapbox.VectorTile.VectorTileReader.dll</HintPath>
     </Reference>
     <Reference Include="Mapbox.IO.Compression">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/ThirdParty/Mapbox.IO.Compression/net35/Mapbox.IO.Compression.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/ThirdParty/Mapbox.IO.Compression/net35/Mapbox.IO.Compression.dll</HintPath>
     </Reference>
     <Reference Include="Mapbox.Json">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/ThirdParty/Mapbox.Json/Net35/Mapbox.Json.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Mapbox SDK/Mapbox/Core/Plugins/ThirdParty/Mapbox.Json/Net35/Mapbox.Json.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.Reflection">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/IKVM.Reflection.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/IKVM.Reflection.dll</HintPath>
     </Reference>
     <Reference Include="IronPython">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/IronPython.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/IronPython.dll</HintPath>
     </Reference>
     <Reference Include="IronPython.Modules">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/IronPython.Modules.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/IronPython.Modules.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Dynamic">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/Microsoft.Dynamic.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/Microsoft.Dynamic.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Scripting">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/Microsoft.Scripting.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/Microsoft.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="IronPython.SQLite">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/DLLs/IronPython.SQLite.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/DLLs/IronPython.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="IronPython.Wpf">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Assets/Plugins/DLLs/IronPython.Wpf.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Assets/Plugins/DLLs/IronPython.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.13f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -771,64 +771,64 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.13f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.TestRunner">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TestRunner">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.multiplayer-hlapi.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.multiplayer-weaver.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.XR.LegacyInputHelpers">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.SpatialTracking">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.XR.LegacyInputHelpers">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.multiplayer-hlapi.Runtime">
-      <HintPath>F:/xj-a unity/Xj-a Unity/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+      <HintPath>F:/xj-a/Unity/Xj-a Unity/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

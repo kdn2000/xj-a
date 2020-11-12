@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using Mapbox.Unity.Map;
+using Mapbox.Utils;
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -11,11 +14,14 @@ namespace Assets.Project.Utilities
     {
         // Start is called before the first frame update
         internal static CarFactory instance;
-        private Car[] cars;
+        public GameObject carPrefab;
+        public AbstractMap abstractMap;
+        private List<Car> cars = new List<Car>();
 
         void Start()
         {
             instance = this.Instance;
+
         }
 
         private void Awake()
@@ -25,7 +31,10 @@ namespace Assets.Project.Utilities
 
         public void CreateCar(float lat, float lon)
         {
-
+            Debug.Log(String.Format("create car, {0}, {1}", lat, lon));
+            Vector2d position = new Vector2d(lat, lon);
+            var car = Instantiate(carPrefab);
+            car.transform.position = abstractMap.GeoToWorldPosition(position, true);
         }
 
         // Update is called once per frame

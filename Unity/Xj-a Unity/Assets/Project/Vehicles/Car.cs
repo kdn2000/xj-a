@@ -7,6 +7,8 @@ public class Car : MonoBehaviour
 {
     // Start is called before the first frame update
     private Camera camera;
+    private Vector2 location;
+    private int id;
 
     void Start()
     {

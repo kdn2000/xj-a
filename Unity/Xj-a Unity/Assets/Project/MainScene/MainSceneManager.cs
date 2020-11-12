@@ -6,10 +6,20 @@ using UnityEngine;
 using Newtonsoft.Json.Linq;
 using IronPython.Runtime;
 using Assets.Project.Utilities;
+using System.Net.Sockets;
+using UnityEditor.Experimental.GraphView;
+using System.Net;
+using Mapbox.Unity.Map;
+using System.Text;
+using System.Threading;
 
 public class MainSceneManager : Singleton<MainSceneManager>
-{    
-    private CarFactory carFactory = CarFactory.instance;
+{
+    private CarFactory carFactory;
+    private SocketServer socketServer = null;
+    static private int port = 65432;
+    static private string address = "127.0.0.1";
+    private bool afterInit = false;
     private dynamic graph;
     private dynamic nodes;
     private dynamic edges;
@@ -18,55 +28,70 @@ public class MainSceneManager : Singleton<MainSceneManager>
 
     void Start()
     {
-        
-        StartCoroutine("GetGraph");
-        for(int i = 0;i < 25; i++)
-        {
-            
-        }
+        carFactory = FindObjectOfType<CarFactory>();
+        Thread init = new Thread(Initialize);
+        init.Start();
     }
 
-    private IEnumerator GetGraph()
+    private void Initialize()
     {
         string json = @"";
-        string cmd = "/C conda activate ox && /C ..\\Utilities\\ScriptStart.py \"Ivano - Frankivsk, Ukraine\" \\..\\Data";
-        string path = Environment.CurrentDirectory + @"\..\Data\map.json";
-        try
-        {
+        string cmd = "/K conda activate ox && python \"Assets\\Project\\Utilities\\PythonScriptManager.py\" \"Ivano - Frankivsk, Ukraine\" ";
+        //string pathJSON = Environment.CurrentDirectory + @"\Assets\Project\Data\map.json";
+        //string pathComm = Environment.CurrentDirectory + @"\Assets\Project\Data\isCommunicate.tmp";
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+        //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+        startInfo.FileName = "cmd.exe";
+        startInfo.Arguments = cmd;
+        process.StartInfo = startInfo;
+        process.Start();
 
-            // Create the file, or overwrite if the file exists.
-            // Open the stream and read it back.
-            System.Diagnostics.Process.Start("CMD.exe", cmd);
+        socketServer = new SocketServer(address, port);
 
-            using (StreamReader sr = File.OpenText(path))
-            {
-                string s = @"[";
-                json += s;
-                while ((s = sr.ReadLine()) != null)
-                {
-                    json += s;
-                }
-                json += @"]";
-            }
-        }
-
-        catch (Exception ex)
-        {
-            Debug.LogError(ex.ToString());
-        }
+        json += @"[";
+        json += socketServer.Receive();
+        json += @"]";
+        Debug.Log("The graph!");
 
         graph = JArray.Parse(json)[0];
         nodes = graph["nodes"];
         edges = graph["edges"];
+        
 
-        yield return null;
+        
+        afterInit = true;
     }
 
-
-
+    private void AfterInit()
+    {
+        System.Random random = new System.Random();
+        for (int i = 0; i < 25; i++)
+        {
+            List<string> attr = new List<string>();
+            double lat = random.NextDouble() * (-48.888 + 48.948) + 48.888;
+            double lon = random.NextDouble() * (-24.68 + 24.752) + 24.68;
+            attr.Add("_SelNearestNode");
+            attr.Add(lat.ToString("0.0000", System.Globalization.CultureInfo.InvariantCulture));
+            attr.Add(lon.ToString("0.0000", System.Globalization.CultureInfo.InvariantCulture));
+            socketServer.SendStandardCommand(attr);
+            string node = socketServer.Receive();
+            carFactory.CreateCar(Convert.ToSingle(nodes[node]["y"]), Convert.ToSingle(nodes[node]["x"]));
+        }
+    }
     // Update is called once per frame
     void Update()
     {
-        
+        if (afterInit)
+        {
+            AfterInit();
+            afterInit = false;
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        socketServer.SendCommand("comm:exit");
+        socketServer.Destroy();
     }
 }
