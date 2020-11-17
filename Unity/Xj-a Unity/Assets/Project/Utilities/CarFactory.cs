@@ -20,13 +20,7 @@ namespace Assets.Project.Utilities
 
         void Start()
         {
-            instance = this.Instance;
 
-        }
-
-        private void Awake()
-        {
-            Assert.IsNotNull(cars);
         }
 
         public void CreateCar(float lat, float lon)

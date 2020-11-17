@@ -5,9 +5,9 @@ using UnityEngine;
 public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     // Start is called before the first frame update
-    private T instance;
+    private static T instance;
 
-    public T Instance
+    public static T Instance
     {
         get
         {
@@ -15,14 +15,22 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             {
                 instance = FindObjectOfType<T>();
             }
-            else
-            {
-                Destroy(gameObject);
-            }
-            DontDestroyOnLoad(gameObject);
             return instance;
         }
 
+    }
+
+    public virtual void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+        if(instance == null)
+        {
+            instance = this as T;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
 }
