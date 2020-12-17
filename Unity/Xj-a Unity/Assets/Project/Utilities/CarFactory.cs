@@ -3,6 +3,7 @@ using Mapbox.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 //using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -16,7 +17,6 @@ namespace Assets.Project.Utilities
         internal static CarFactory instance;
         public GameObject carPrefab;
         public AbstractMap abstractMap;
-        private List<Car> cars = new List<Car>();
 
         void Start()
         {
@@ -29,7 +29,10 @@ namespace Assets.Project.Utilities
             Vector2d position = new Vector2d(lat, lon);
             var car = Instantiate(carPrefab);
             car.transform.position = abstractMap.GeoToWorldPosition(position, true);
+
         }
+
+        
 
         // Update is called once per frame
         void Update()

@@ -1,9 +1,11 @@
 from infrastructure import Infrastructure
 
 import osmnx as ox
+import networkx as nx
 from dataDriver import DataDriver
 import sys
 import os
+import pathlib
 import socket
 import threading
 
@@ -11,16 +13,16 @@ HOST = "127.0.0.1"
 PORT = 65432
 
 class PythonManager:
-    def __init__(self, place):
-        print(place)
-        self._G = ox.graph_from_place("Ivano - Frankivsk, Ukraine", 'drive', simplify=False)
+    def __init__(self, place, dir_):
+        print(place, dir_)
+        self._G = ox.graph_from_place(place, 'drive', simplify=False)
         self._infrastructure = Infrastructure(self._G)
-        self._dataDriver = DataDriver(HOST, PORT)
+        self._dataDriver = DataDriver(HOST, PORT, dir_)
         self._infrastructure.ExpansionRoads()
         self._infrastructure.CreateIfTrafficLights()
         # self._dataDriver.GetPOIs(place, {'amenity': ['cafe', 'fast_food', 'bus_station', 'fuel', 'parking', 'bank', 'clinic', 'hospital', 'nightclub', 'casino', 'fire_station', 'police', 'townhall', '	restaurant', 'swingerclub', 'stripclub'],
         #                            'building': 'office'})
-        self._dataDriver.Export(self._G)
+        self._dataDriver.Export(self._G, place)
         self._StartCommunication()
     
     def _StartCommunication(self):
@@ -71,6 +73,12 @@ class PythonManager:
         Node, Len = ox.distance.get_nearest_node(self._G, Point, method='haversine', return_dist=True)
         return str(Node)
         
+    def _SetRoute(self, attr):
+        route = nx.dijkstra_path(self._G, int(attr[0]), int(attr[1]), weight='length')
+        value = "" 
+        for item in route:
+            value += str(item) + ','
+        return value
 
 
 # def main():
@@ -87,5 +95,6 @@ class PythonManager:
         
 if __name__ == "__main__":
     place = sys.argv[1]
-    pythonManager = PythonManager(place)
+    dir_ = os.path.dirname(os.path.abspath(__file__)) + sys.argv[2]
+    pythonManager = PythonManager(place, dir_)
     

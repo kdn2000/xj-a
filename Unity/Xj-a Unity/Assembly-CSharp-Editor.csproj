@@ -164,6 +164,17 @@
     <Compile Include="Assets\Mapbox SDK\ThirdPartyAssets\WoLfulus\LineEnding\Editor\LogEntries.cs" />
     <Compile Include="Assets\Mapbox SDK\ThirdPartyAssets\WoLfulus\LineEnding\Editor\LogEntry.cs" />
     <Compile Include="Assets\Mapbox SDK\UnityARKitPlugin\Plugins\iOS\UnityARKit\Editor\UnityARBuildPostprocessor.cs" />
+    <Compile Include="Assets\Packages\UnityFBXExporter\Editor\ExporterMenu.cs" />
+    <Compile Include="Assets\Packages\UnityFBXExporter\Editor\ProceduralTest.cs" />
+    <Compile Include="Assets\Pedestrian System\Editor\PedestrianNodeEditor.cs" />
+    <Compile Include="Assets\Pedestrian System\Editor\PedestrianObjectEditor.cs" />
+    <Compile Include="Assets\Pedestrian System\Editor\PedestrianSystemEditor.cs" />
+    <Compile Include="Assets\Traffic System\Editor\TrafficSystemAwarenessTriggerEditor.cs" />
+    <Compile Include="Assets\Traffic System\Editor\TrafficSystemEditor.cs" />
+    <Compile Include="Assets\Traffic System\Editor\TrafficSystemEditorWindow.cs" />
+    <Compile Include="Assets\Traffic System\Editor\TrafficSystemIntersectionEditor.cs" />
+    <Compile Include="Assets\Traffic System\Editor\TrafficSystemNodeEditor.cs" />
+    <Compile Include="Assets\Traffic System\Editor\TrafficSystemPieceEditor.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.13f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

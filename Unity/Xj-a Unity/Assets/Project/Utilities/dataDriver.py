@@ -5,10 +5,11 @@ import os
 import socket
 
 class DataDriver:
-    def __init__(self, host, port):
+    def __init__(self, host, port, dir_):
         self.__FeaturesData = []
         self.__POIsData = None
         self.__socket  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__dir = dir_
         self.Connect(host, port)
     
     def Connect(self, host, port):
@@ -71,7 +72,7 @@ class DataDriver:
         self.__socket.close()
 
     # Спізділь. Експорт нашого графа
-    def Export(self, G, format_='json'):
+    def Export(self, G, name, format_='json'):
         # if format_ == 'gpkg':
         #     save_graph_geopackage(G, filepath=self.__dir +'\\map.gpkg')
         # if format_ == 'svg':    
@@ -85,9 +86,12 @@ class DataDriver:
             for n, d in G.nodes(data=True):
                 nodes_[n] = d
             for v, u, d in G.edges.data():
-                edges_[v] = {u: d}
+                d['end'] = str(u)
+                edges_[v] = d
                 #print(edges_[v][u])
-            self.Send(json.dumps({str('nodes'): nodes_, str('edges'): edges_}))
+            with open(self.__dir + '/{0}.json'.format(name), 'w') as file:
+                json.dump({str('nodes'): nodes_, str('edges'): edges_}, file)
+            self.Send("Send json")
             print("Send json")
 
             
