@@ -1,5 +1,5 @@
 from random import randint
-from math import atan, pi, ceil, floor, sqrt
+from math import atan, pi, ceil, floor, sqrt, cos
 
 class Infrastructure:
 
@@ -29,39 +29,54 @@ class Infrastructure:
                 Angle = pi/2
             else:
                 Angle = atan(Side1/Side2)
+
             d['angle'] = Angle
 
     
     """ Створюєм світлофори в архітектурі osmnx. Обнова: тепер для доріг різні delays і відкрито/закрито"""
     def CreateIfTrafficLights(self):
         for n, d in self.__G.nodes(data=True):
-            if  'highway' in d:
-                if d['highway'] == 'traffic_signals':
-                    d['is_light'] = True
+
+            Edges = [e for e in self.__G.edges(n)]
+            d['number_of_intersections'] = len(Edges)
+
+            # try:
+            #     for v, u in Edges:
+            #         Side1 = self.__G.nodes[u]['x'] - self.__G.nodes[v]['x']
+            #         Side2 = self.__G.nodes[u]['y'] - self.__G.nodes[v]['y']
+            #         SumAngle = atan(Side1 / Side2 )
+            # except:
+            #     pass
+            
+            # d['angle_of_intersections'] = SumAngle
+
+            # if  'highway' in d:
+            #     if d['highway'] == 'traffic_signals':
                     # d['for_open'] = {'first_group': [], 'second_group': []}
                     # d['is_open'] = [True, False]
-                    try:
-                        Edges = [e for e in self.__G.edges(n)]
-                        #d['for_open']['first_group'].append(Edges[0])
-                        # Edges.pop(0)
-                        # Алгоритм на знаходження пересічень з світлофором (edited)
+            try:
+                #d['for_open']['first_group'].append(Edges[0])
+                # Edges.pop(0)
+                # Алгоритм на знаходження пересічень з світлофором (edited)
 
-                        SumAngle = 0
-                        for v, u in Edges:
-                            Side1 = self.__G.nodes[u]['x'] - self.__G.nodes[v]['x']
-                            Side2 = self.__G.nodes[u]['y'] - self.__G.nodes[v]['y']
-                            SumAngle += atan(Side1 / Side2)    
-                        
-                        SumAngle /= len(Edges)
-                        d['number_of_intersections'] = len(Edges)
-                        d['angle_of_intersections'] = SumAngle
-                    except:
-                        pass
+                SumAngle = 0
+                for v, u in Edges:
+                    Side1 = self.__G.nodes[u]['x'] - self.__G.nodes[v]['x']
+                    Side2 = self.__G.nodes[u]['y'] - self.__G.nodes[v]['y']
+                    SumAngle += atan(Side1 / Side2)    
+                
+                SumAngle /= len(Edges)
+                d['angle_of_intersections'] = SumAngle
+
+            except:
+                pass
                 #     d['timer'] = randint(20, 100)
                 #     self.__Lights.append({'osmid' : n, 'delay': [d['timer'], randint(20, 100)]})
                 # else:
                 #     d['is_light'] = False
-    
+
+           
+
     # Розраховуєм чи зелене світло, чи червоне
     def Calc(self):
         Nodes = self.__G.nodes.data()

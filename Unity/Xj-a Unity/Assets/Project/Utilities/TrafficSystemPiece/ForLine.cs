@@ -12,7 +12,7 @@ public class ForLine : MonoBehaviour
         {
             if (node.Name == endNode)
             {
-                return node.Value.GetValue("name_piece").ToString();
+                return node.Value.GetValue("name_piece").ToString() + " " + node.Name;
             }
         }
         return "";

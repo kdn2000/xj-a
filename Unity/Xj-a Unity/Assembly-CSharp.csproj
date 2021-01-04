@@ -617,9 +617,13 @@
     <Compile Include="Assets\Project\MainScene2D\MainSceneManager.cs" />
     <Compile Include="Assets\Project\MainScene2D\SocketServer.cs" />
     <Compile Include="Assets\Project\Utilities\CarFactory.cs" />
+    <Compile Include="Assets\Project\Utilities\CreateRoad.cs" />
+    <Compile Include="Assets\Project\Utilities\NodeStruct.cs" />
+    <Compile Include="Assets\Project\Utilities\SerializeJSON.cs" />
     <Compile Include="Assets\Project\Utilities\Singleton.cs" />
     <Compile Include="Assets\Project\Utilities\TrafficSystemPiece\ForLine.cs" />
     <Compile Include="Assets\Project\Utilities\TrafficSystemPiece\ForLineEditor.cs" />
+    <Compile Include="Assets\Project\Utilities\WayStruct.cs" />
     <Compile Include="Assets\Project\Vehicles\ITransport.cs" />
     <Compile Include="Assets\Project\Vehicles\MainCar\Car.cs" />
     <Compile Include="Assets\Project\Vehicles\TransportManager.cs" />

@@ -22,54 +22,55 @@ public class MainSceneManager : Singleton<MainSceneManager>
     static private string address = "127.0.0.1";
     static public string place = "Ivano - Frankivsk, Ukraine";
     private bool afterInit = false;
-    private dynamic graph;
-    public dynamic nodes;
-    public dynamic edges;
+    private bool completeFlag = false;
+    public JObject nodes;
+    public JObject edges;
 
 
 
     void Start()
     {
         TrafficSystemBuilder.Instance.SetRoadsScale(scaleKoefficient - 2f);
-        Thread init = new Thread(Initialize);
-        init.Start();
+        //Thread init = new Thread(Initialize);
+        //init.Start();
         TrafficSystemBuilder.Instance.TestOrDebug();
+        StartCoroutine(routine: SerializeJSON.Instance.Generate("Івано-Франківськ"));
     }
 
     private void Initialize()
     {
-        string json = @"";
-        string cmd = "/K conda activate ox && python \"Assets\\Project\\Utilities\\PythonScriptManager.py\" \"Ivano - Frankivsk, Ukraine\" \"/../Data\" ";
-        //string pathJSON = Environment.CurrentDirectory + @"\Assets\Project\Data\map.json";
-        //string pathComm = Environment.CurrentDirectory + @"\Assets\Project\Data\isCommunicate.tmp";
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-        //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-        startInfo.FileName = "cmd.exe";
-        startInfo.Arguments = cmd;
-        process.StartInfo = startInfo;
-        process.Start();
+        //string json = @"";
+        //string cmd = "/K conda activate ox && python \"Assets\\Project\\Utilities\\PythonScriptManager.py\" \"Ivano - Frankivsk, Ukraine\" \"/../Data\" ";
+        ////string pathJSON = Environment.CurrentDirectory + @"\Assets\Project\Data\map.json";
+        ////string pathComm = Environment.CurrentDirectory + @"\Assets\Project\Data\isCommunicate.tmp";
+        //System.Diagnostics.Process process = new System.Diagnostics.Process();
+        //System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+        ////startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+        //startInfo.FileName = "cmd.exe";
+        //startInfo.Arguments = cmd;
+        //process.StartInfo = startInfo;
+        //process.Start();
 
-        socketServer = new SocketServer(address, port);
-        cmd = socketServer.Receive();
-        if(File.Exists(Directory.GetCurrentDirectory() + "\\Assets\\Project\\Data\\" + place + ".json") && cmd == "Send json")
-        {
-            string[] jsonBuffer = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\Assets\\Project\\Data\\" + place + ".json");
-            json += @"[";
-            foreach(string line in jsonBuffer)
-            {
-                json += line;
-            }
-            json += "]";
-        }
+        //socketServer = new SocketServer(address, port);
+        //cmd = socketServer.Receive();
+        //if(File.Exists(Directory.GetCurrentDirectory() + "\\Assets\\Project\\Data\\" + place + ".json") && cmd == "Send json")
+        //{
+        //    string[] jsonBuffer = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\Assets\\Project\\Data\\" + place + ".json");
+        //    json += @"[";
+        //    foreach(string line in jsonBuffer)
+        //    {
+        //        json += line;
+        //    }
+        //    json += "]";
+        //}
         
         Debug.Log("The graph!");
 
-        graph = JArray.Parse(json)[0];
-        nodes = graph["nodes"];
-        edges = graph["edges"];
-        
+        while (!SerializeJSON.Instance.CompleteFlag) { }
 
+        nodes = SerializeJSON.Instance.Nodes;
+        edges = SerializeJSON.Instance.Edges;
+        
         
         afterInit = true;
     }
@@ -96,16 +97,21 @@ public class MainSceneManager : Singleton<MainSceneManager>
     // Update is called once per frame
     void Update()
     {
-        if (afterInit)
+        if (SerializeJSON.Instance.CompleteFlag)
         {
-            AfterInit();
-            afterInit = false;
+            Debug.Log("The graph!");
+
+            nodes = SerializeJSON.Instance.Nodes;
+            edges = SerializeJSON.Instance.Edges;
+
+
+            TrafficSystemBuilder.Instance.GenerateTrafficSystem(nodes, edges);
         }
     }
 
-    private void OnApplicationQuit()
-    {
-        socketServer.SendCommand("comm:exit");
-        socketServer.Destroy();
-    }
+    //private void OnApplicationQuit()
+    //{
+    //    socketServer.SendCommand("comm:exit");
+    //    socketServer.Destroy();
+    //}
 }

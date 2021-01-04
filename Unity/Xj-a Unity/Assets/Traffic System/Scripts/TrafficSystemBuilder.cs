@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -40,46 +41,75 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 		Vector2 currentPos = new Vector2(-1, -1);
 		Vector2 endPos = new Vector2(-1, -1);
 
+		// Костиль. Беремо першу ноду як опорну
 		foreach (dynamic node in nodes)
 		{
-			normalPos = new Vector2((float)node.Value.GetValue("x").Value, (float)node.Value.GetValue("y").Value);
+			normalPos = new Vector2((float)node.Value.GetValue("lat").Value, (float)node.Value.GetValue("lon").Value);
 			break;
 		}
 
-   //     foreach (dynamic node in nodes)
-   //     {
-   //         currentPos = new Vector2(((float)node.Value.GetValue("x") - normalPos.x), ((float)node.Value.GetValue("y").Value - normalPos.y)) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
-			//CreateRoad(prefabStraight2Line, currentPos.x, currentPos.y, -1);
-   //     }
+		//     foreach (dynamic node in nodes)
+		//     {
+		//         currentPos = new Vector2(((float)node.Value.GetValue("x") - normalPos.x), ((float)node.Value.GetValue("y").Value - normalPos.y)) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
+		//CreateRoad(prefabStraight2Line, currentPos.x, currentPos.y, -1);
+		//     }
 
-  //      foreach (dynamic edge in edges)
-  //      {
+		//      foreach (dynamic edge in edges)
+		//      {
 		//	currentPos = new Vector2( (float) nodes[edge.Name]["x"] - normalPos.x, (float)nodes[edge.Name]["y"] - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
 		//	string endNode = edge.Value.GetValue("end").ToString();
 		//	endPos = new Vector2( (float) nodes[endNode]["x"] - normalPos.x, (float) nodes[endNode]["y"] - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
 		//	string name = CreateLine( Mathf.Sqrt(Mathf.Pow(currentPos.x - endPos.x, 2) + Mathf.Pow(currentPos.y - endPos.y, 2)), new Vector3(currentPos.x, currentPos.y, (float) edge.Value.GetValue("angle")));
 		//	nodes[edge.Name]["name_piece"] = name;
 		//}
+		GameObject parentOfIntersection = new GameObject();
+		parentOfIntersection.name = "Intersections Father";
+		parentOfIntersection.transform.parent = TrafficSystem.Instance.transform;
 
-		foreach (dynamic node in nodes)
-        {
-			//if(node.Value.GetValue("highway") == "traffic_signals")
-   //         {
+		//foreach (dynamic node in nodes)
+  //      {
+		//	//if(node.Value.GetValue("highway") == "traffic_signals")
+		//	//{
 
-   //         }
-			foreach(dynamic edge in edges)
-            {
-				if(edge.Name == node.Name)
-                {
-					currentPos = new Vector2((float)nodes[edge.Name]["x"] - normalPos.x, (float)nodes[edge.Name]["y"] - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
-					string endNode = edge.Value.GetValue("end").ToString();
-					endPos = new Vector2((float)nodes[endNode]["x"] - normalPos.x, (float)nodes[endNode]["y"] - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
-					string name = CreateLine(LenghtOfTwoNodes(currentPos, endPos), edge.Name, new Vector3(currentPos.x, currentPos.y, (float)edge.Value.GetValue("angle")), new Vector2(endPos.x, endPos.y));
-					nodes[edge.Name]["name_piece"] = name;
-				}
-            }
-        }
+		//	//}
+
+			
+		//	if (node.Value.GetValue("number_of_intersections").Value > 2)
+		//	{
+		//		currentPos = new Vector2((float)node.Value.GetValue("x").Value - normalPos.x, (float)node.Value.GetValue("y").Value - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
+		//		if (node.Value.GetValue("number_of_intersections").Value == 3)
+		//		{
+		//			CreateIntersectionT(parentOfIntersection, node.Name, new Vector3(currentPos.x, currentPos.y, (float)node.Value.GetValue("angle_of_intersections").Value));
+		//		}
+		//		else
+		//		{
+		//			CreateIntersectionX(parentOfIntersection, node.Name, new Vector3(currentPos.x, currentPos.y, (float)node.Value.GetValue("angle_of_intersections").Value));
+		//		}
+		//	}
+			
+  //      }
+
+		// Робимо порядок з дорогами
+		foreach (dynamic edge in edges)
+		{
+			currentPos = new Vector2((float)nodes[edge.Value.GetValue("begin").ToString()]["lat"] - normalPos.x, (float)nodes[edge.Value.GetValue("begin").ToString()]["lon"] - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
+			string endNode = edge.Value.GetValue("end").ToString();
+			endPos = new Vector2((float)nodes[endNode]["lat"] - normalPos.x, (float)nodes[endNode]["lon"] - normalPos.y) * Mathf.Pow(10, TrafficSystem.Instance.m_roadScale + 2f);
+			string name = CreateLine(LenghtOfTwoNodes(currentPos, endPos), edge.Value.GetValue("begin").ToString(), new Vector3(currentPos.x, currentPos.y, (float)edge.Value.GetValue("angle")), new Vector2(endPos.x, endPos.y));
+			nodes[edge.Name]["name_piece"] = name;
+		}
+
 	}
+
+    public void CreateIntersectionT(GameObject parent, string nameNode, Vector3 pos)
+    {
+		string name = CreateRoad(prefabT2Intersection, parent, nameNode, pos.x, pos.y, pos.z);
+    }
+
+	public void CreateIntersectionX(GameObject parent, string nameNode, Vector3 pos)
+    {
+		string name = CreateRoad(prefabX2Intersection, parent, nameNode, pos.x, pos.y, pos.z);
+    }
 
     public string CreateLine(float lenght, string nameNode, Vector3 beginPos, Vector2 endPos)
     {
@@ -89,22 +119,35 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 
 		int count = Mathf.RoundToInt(lenght / (TrafficSystem.Instance.m_roadScale * lengthOfStraight2Line)) - 1;
 
-		if ((((endPos.x - beginPos.x) * Mathf.Cos(beginPos.z)  > 0 && beginPos.z > Mathf.PI) && ((endPos.y - beginPos.y) * Mathf.Sin(beginPos.z) > 0 && beginPos.z > Mathf.PI)) || (((endPos.x - beginPos.x) * Mathf.Cos(beginPos.z) < 0 && beginPos.z < Mathf.PI) && ((endPos.y - beginPos.y) * Mathf.Sin(beginPos.z) < 0 && beginPos.z < Mathf.PI))) beginPos.z -= Mathf.PI;
+		GameObject parentLine = new GameObject();
+		parentLine.transform.parent = TrafficSystem.Instance.transform;
 
-		if (count >= 0) head = CreateRoad(prefabStraight2Line, nameNode, beginPos.x, beginPos.y, beginPos.z);
+		parentLine.transform.position = new Vector3(beginPos.x, TrafficSystem.Instance.transform.position.y, beginPos.z);
+
+		if (count >= 0) head = CreateRoad(prefabStraight2Line, parentLine, nameNode, beginPos.x, beginPos.y, beginPos.z);
+
+		parentLine.name = head;
+
+		//if (LenghtOfTwoNodes(new Vector2(beginPos.x - 4 * Mathf.Cos(TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles.y), beginPos.y + 4 * Mathf.Sin(TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles.y)), endPos) * 1000 > LenghtOfTwoNodes(new Vector2(beginPos.x - 4 * Mathf.Cos(TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles.y - Mathf.PI), beginPos.y + 4 * Mathf.Sin(TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles.y + Mathf.PI)), endPos) * 1000) TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles -= new Vector3(0f, Mathf.PI, 0f);
+
+		float sin = Mathf.Sin(ToPI(TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles.y));
+
+		if ((endPos.x - beginPos.x) * sin < 0) TrafficSystem.Instance.AnchorTrafficSystemPiece.transform.eulerAngles += new Vector3(0f, 180f, 0f);
 
 		count--;
 
 		if (count >= 0)
 		{
 			previousFakePiece = Instantiate(fakeStraightPrefab);
-			CreateFakeRoad(previousFakePiece, TrafficSystem.Instance.AnchorTrafficSystemPiece);
+			CreateFakeRoad(previousFakePiece, TrafficSystem.Instance.AnchorTrafficSystemPiece, parentLine);
 		}
+
+		
 
 		for (int i = 0; i < count; i++)
         {
 			fakePiece = Instantiate(fakeStraightPrefab);
-			CreateFakeRoad(fakePiece, previousFakePiece);
+			CreateFakeRoad(fakePiece, previousFakePiece, parentLine);
 			previousFakePiece = fakePiece;
 		}
 
@@ -127,8 +170,7 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 	// МОРДОР
 	// МОРДОР
 
-
-	public void CreateFakeRoad(GameObject fakePiece, GameObject attachPiece)
+	private void CreateFakeRoad(GameObject fakePiece, GameObject attachPiece, GameObject parent)
     {
 		if (fakePiece)
         {
@@ -140,12 +182,12 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 
 			PositionTrafficSystemFakePiece(fakePiece, attachPiece, false);
 
-			fakePiece.transform.parent = TrafficSystem.Instance.transform;
+			fakePiece.transform.parent = parent.transform;
 
 		}
     }
 
-	public void CreateFakeRoad(GameObject fakePiece, TrafficSystemPiece attachPiece)
+	private void CreateFakeRoad(GameObject fakePiece, TrafficSystemPiece attachPiece, GameObject parent)
     {
 		if (fakePiece)
 		{
@@ -157,12 +199,11 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 
 			PositionTrafficSystemFakePiece(fakePiece, attachPiece, false);
 
-			fakePiece.transform.parent = TrafficSystem.Instance.transform;
-
+			fakePiece.transform.parent = parent.transform;
 		}
 	}
 
-	public string CreateRoad(TrafficSystemPiece prefabTrafficSystemPiece, string nameNode, float posX = -1f, float posY = -1f, float angle = -1f)
+	private string CreateRoad(TrafficSystemPiece prefabTrafficSystemPiece, GameObject parent, string nameNode, float posX = -1f, float posY = -1f, float angle = -1f)
 	{
 		TrafficSystemPiece roadPiece = prefabTrafficSystemPiece;
 		string name = "";
@@ -213,8 +254,8 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 				// position
 				if (TrafficSystem.Instance)
 				{
-					UpdateEditTrafficSystemPiecePos(posX, posY, angle);
-					roadPieceClone.transform.parent = TrafficSystem.Instance.transform;
+					UpdateEditTrafficSystemPiecePos(new Vector3(posX, posY, angle));
+					roadPieceClone.transform.parent = parent.transform;
 
 
 					// set the quality of the road
@@ -378,8 +419,8 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 					}
 					//pos.z = m_attachRenderer.transform.position.z + roadPieceSize * Mathf.Cos(a_currentPiece.transform.eulerAngles.y * Mathf.PI / 180);
 					//pos.x = m_attachRenderer.transform.position.x + roadPieceSize * Mathf.Sin(a_currentPiece.transform.eulerAngles.y * Mathf.PI / 180);
-					pos.x = m_attachRenderer.transform.position.x - roadPieceSize * Mathf.Cos(a_currentPiece.transform.eulerAngles.y * Mathf.PI / 180);
-					pos.z = m_attachRenderer.transform.position.z + roadPieceSize * Mathf.Sin(a_currentPiece.transform.eulerAngles.y * Mathf.PI / 180);
+					pos.x = m_attachRenderer.transform.position.x - roadPieceSize * Mathf.Cos(ToPI(a_currentPiece.transform.eulerAngles.y));
+					pos.z = m_attachRenderer.transform.position.z + roadPieceSize * Mathf.Sin(ToPI(a_currentPiece.transform.eulerAngles.y));
 				}
 				break;
 		}
@@ -697,17 +738,17 @@ public class TrafficSystemBuilder : Singleton<TrafficSystemBuilder>
 		else
 			a_currentPiece.transform.position = pos;
 
-		UpdateEditTrafficSystemPiecePos(-1, -1, 0);
+		UpdateEditTrafficSystemPiecePos(new Vector3(-1, -1, 0));
 	}
 
-	private void UpdateEditTrafficSystemPiecePos(float posX, float posY, float angle)
+	private void UpdateEditTrafficSystemPiecePos(Vector3 pos)
 	{
 		TrafficSystem.Instance.SetTrafficSystemPiece(TrafficSystem.TrafficSystemTooltip.EDIT, TrafficSystem.Instance.EditTrafficSystemPiece); // force reposition of edit icon
 
-		if (posX != -1 && posY != -1)
+		if (pos.x != -1 && pos.y != -1)
 		{
-			TrafficSystem.Instance.EditTrafficSystemPiece.transform.position = new Vector3(posX, TrafficSystem.Instance.EditTrafficSystemPiece.transform.position.y, posY);
-			TrafficSystem.Instance.EditTrafficSystemPiece.transform.eulerAngles = new Vector3(TrafficSystem.Instance.EditTrafficSystemPiece.transform.eulerAngles.x, FromPI(angle), TrafficSystem.Instance.EditTrafficSystemPiece.transform.eulerAngles.z);
+			TrafficSystem.Instance.EditTrafficSystemPiece.transform.position = new Vector3(pos.x, TrafficSystem.Instance.EditTrafficSystemPiece.transform.position.y, pos.y);
+			TrafficSystem.Instance.EditTrafficSystemPiece.transform.eulerAngles = new Vector3(TrafficSystem.Instance.EditTrafficSystemPiece.transform.eulerAngles.x, FromPI(pos.z), TrafficSystem.Instance.EditTrafficSystemPiece.transform.eulerAngles.z);
 		}
 	}
 
